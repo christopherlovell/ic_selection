@@ -1,5 +1,7 @@
 
 import numpy as np
+import pandas as pd
+
 from scipy.stats import norm
 from scipy.spatial.distance import cdist
 from methods import near_coords,simulation
@@ -73,12 +75,14 @@ def overlapping_regions(coods,delta_log,sim):
 dl = np.array([delta_log[tuple(s2)] for s2 in sel_2s])
 olap_mask = overlapping_regions(coods[:100],dl[:100],sim=sim)
 
-print('Non-overlapping regions:',coods[:100][olap_mask])
+print_df = pd.DataFrame({'x':coods[olap_mask,0],'y':coods[olap_mask,1],'z':coods[olap_mask,2]})
+print_df['log(1+delta)'] = dl[olap_mask]
+print_df['delta'] = np.exp(print_df['log(1+delta)']) - 1
+print_df['sigma'] = (dl[olap_mask] - mu) / sig
+print("2-sigma regions:")
+print(print_df)
 
-
-
-
-
+# print('Non-overlapping regions:',coods[:100][olap_mask])
 
 ## Find overdensity / sigma for given coordinates
 def grid_coordinates(coods, sim):
@@ -96,6 +100,7 @@ print_df['log(1+delta)'] = [delta_log[tuple(gc)] for gc in gcood]
 print_df['delta'] = np.exp(print_df['log(1+delta)']) - 1 
 print_df['sigma'] = [(delta_log[tuple(gc)] - mu) / sig for gc in gcood]
 
+print("Already selected regions:")
 print(print_df)
 
 
@@ -113,5 +118,7 @@ print_df = pd.DataFrame({'x':coods[olap_mask,0],'y':coods[olap_mask,1],'z':coods
 print_df['log(1+delta)'] = dl[olap_mask]
 print_df['delta'] = np.exp(print_df['log(1+delta)']) - 1 
 print_df['sigma'] = (dl[olap_mask] - mu) / sig
+
+print("Newly selected most overdense regions:")
 print(print_df)
 
