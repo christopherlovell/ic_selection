@@ -44,39 +44,3 @@ def write_multidimensional_array(arr, fname):
     return True
 
 
-def near_coords(pos, r, conv):
-    
-    """
-    Gives the coordinates of the points near to the given point inside a a given radius
-    coords: in terms of the simuation box coordinates
-    pos_coords: array position
-    """
-    
-    a, b, c = pos
-    pos_coords = []
-    sz = int(max(r)/conv)+1
-    
-    x = np.arange(a-sz, a+sz+1)
-    y = np.arange(b-sz, b+sz+1)
-    z = np.arange(c-sz, c+sz+1)
-    
-    x[x < 0] += grid
-    y[y < 0] += grid
-    z[z < 0] += grid
-    
-    x[x >= grid] -= grid
-    y[y >= grid] -= grid
-    z[z >= grid] -= grid
-    
-    for i in x: 
-        for j in y:
-            for k in z:
-                pos_coords.append([i, j, k])
-    
-    pos_coords = np.array(pos_coords)
-    
-    coords = pos_coords.astype(float)*conv 
-    
-    return coords, pos_coords
-
-
