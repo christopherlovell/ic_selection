@@ -4,7 +4,7 @@ import pandas as pd
 
 from scipy.stats import norm
 from scipy.spatial.distance import cdist
-from methods import near_coords,simulation
+from methods import simulation, grid_coordinates
 
 import matplotlib
 matplotlib.use('Agg')
@@ -20,13 +20,16 @@ dat = dat.reshape((sim.grid,sim.grid,sim.grid))
 delta_log = np.log(dat)
 mu, sig = norm.fit(delta_log.flatten())
 
+norm = norm(loc=mu,scale=sig)
 
+import pickle as pcl
+pcl.dump(norm,open('log_delta_fit.p','wb'))
 
 ## Plot distribution and fit
 fig, ax = plt.subplots(1,1)
 plt.hist(delta_log.flatten(), density='normed',bins=100)
 x = np.linspace(-3,3,100)
-plt.plot(x,norm(loc=mu,scale=sig).pdf(x))
+plt.plot(x,norm.pdf(x))
 plt.xlim(-2.5,2.5)
 plt.savefig('log_fit.png')
 # plt.show()
@@ -75,18 +78,17 @@ def overlapping_regions(coods,delta_log,sim):
 dl = np.array([delta_log[tuple(s2)] for s2 in sel_2s])
 olap_mask = overlapping_regions(coods[:100],dl[:100],sim=sim)
 
-print_df = pd.DataFrame({'x':coods[olap_mask,0],'y':coods[olap_mask,1],'z':coods[olap_mask,2]})
-print_df['log(1+delta)'] = dl[olap_mask]
+print_df = pd.DataFrame({'x':coods[:100][olap_mask,0],
+                         'y':coods[:100][olap_mask,1],
+                         'z':coods[:100][olap_mask,2]})
+
+print_df['log(1+delta)'] = dl[:100][olap_mask]
 print_df['delta'] = np.exp(print_df['log(1+delta)']) - 1
-print_df['sigma'] = (dl[olap_mask] - mu) / sig
+print_df['sigma'] = (dl[:100][olap_mask] - mu) / sig
 print("2-sigma regions:")
 print(print_df)
 
 # print('Non-overlapping regions:',coods[:100][olap_mask])
-
-## Find overdensity / sigma for given coordinates
-def grid_coordinates(coods, sim):
-    return (coods / sim.conv).astype(int)
 
 
 # example for previous selection

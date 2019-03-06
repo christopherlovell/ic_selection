@@ -44,3 +44,9 @@ def write_multidimensional_array(arr, fname):
     return True
 
 
+def grid_coordinates(coods, sim):
+    """
+    Find overdensity / sigma for given coordinates
+    """
+    return (coods / sim.conv).astype(int)
+
