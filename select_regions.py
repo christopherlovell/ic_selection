@@ -62,7 +62,7 @@ def rem_overlapping_regions(df, coords, sim, same):
     arr = np.ones(len(tmp))*np.nan
     
     if same:
-        print ("Computing across same coordinates")
+        print ("Computing distances across same coordinates")
         dist = cdist(coords,coords,'euclidean')
         for i in range(len(dist)):
         
@@ -72,7 +72,7 @@ def rem_overlapping_regions(df, coords, sim, same):
                 arr[ok] = ok
     
     else:
-        print ("Computing across coordinates from dataframes")
+        print ("Computing distances across coordinates from dataframes")
         sel_coords = np.zeros((len(tmp), 3))
         comp_coords = np.zeros((len(coords), 3))
         sel_coords[:,0], sel_coords[:,1], sel_coords[:,2] = tmp['x'], tmp['y'], tmp['z']
@@ -90,28 +90,32 @@ def rem_overlapping_regions(df, coords, sim, same):
 
     return tmp
 
-#For the densest region it is much better to sort them from highest to lowest overdensity
-sel = np.where(delta_log > 4.95*sig + mu)
-sel_hdel = np.zeros((len(sel[0]), 3))
-sel_hdel[:,0], sel_hdel[:,1], sel_hdel[:,2] = sel[0], sel[1], sel[2]
-coords_hdel = sel_hdel * sim.conv
+def get_highest_overdensity(delta_log, sim, mu, sig):
 
-## Dataframe contents of the highest overdensity regions:
-df_hdel = pd.DataFrame({'x': coords_hdel[:,0], 'y': coords_hdel[:,1], 'z': coords_hdel[:,2]})
-df_hdel['log(1+delta)'] = delta_log[sel] 
-df_hdel['delta'] = np.exp(df_hdel['log(1+delta)']) - 1
-df_hdel['sigma'] = (delta_log[sel] - mu)/sig 
-df_hdel = (df_hdel.sort_values(by=['sigma'], ascending=False)).reset_index(drop=True)
-coords_hdel[:,0], coords_hdel[:,1], coords_hdel[:,2] = df_hdel['x'], df_hdel['y'], df_hdel['z']
+    #For the densest region it is much better to sort them from highest to lowest overdensity
+    sel = np.where(delta_log > 4.95*sig + mu)
+    sel_hdel = np.zeros((len(sel[0]), 3))
+    sel_hdel[:,0], sel_hdel[:,1], sel_hdel[:,2] = sel[0], sel[1], sel[2]
+    coords_hdel = sel_hdel * sim.conv
 
-#Removing overlapping regions overlapping within the overdense ones
-df_hdel = rem_overlapping_regions(df_hdel, coords_hdel, sim, True)   
-print ("Highest overdensity regions > 4.95 sigma: ")
-print (df_hdel.head())
+    ## Dataframe contents of the highest overdensity regions:
+    df_hdel = pd.DataFrame({'x': coords_hdel[:,0], 'y': coords_hdel[:,1], 'z': coords_hdel[:,2]})
+    df_hdel['log(1+delta)'] = delta_log[sel] 
+    df_hdel['delta'] = np.exp(df_hdel['log(1+delta)']) - 1
+    df_hdel['sigma'] = (delta_log[sel] - mu)/sig 
+    df_hdel = (df_hdel.sort_values(by=['sigma'], ascending=False)).reset_index(drop=True)
+    coords_hdel[:,0], coords_hdel[:,1], coords_hdel[:,2] = df_hdel['x'], df_hdel['y'], df_hdel['z']
+
+    #Removing overlapping regions overlapping within the overdense ones
+    df_hdel = rem_overlapping_regions(df_hdel, coords_hdel, sim, True)   
+    print ("Highest overdensity regions > 4.95 sigma: ")
+    print (df_hdel.head())
+    
+    return df_hdel
 
 
 #select required-sigma regions -> req*sigma +/- tol:
-sel_sigma = selection(delta_log, centre=mu, sig=sig, dx=req, tol=1e-4).T
+sel_sigma = selection(delta_log, centre=mu, sig=sig, dx=req, tol=1e-3).T
 
 #Randomly select 100 such regions from here. This selection would remain 
 #the same as long as the set 'tol' remains the unchanged with same seed '680010'.  
@@ -129,8 +133,12 @@ df_sigma['sigma'] = (delta_log[sel] - mu)/sig
 #Removing overlapping regions within this overdensity range
 df_nonoverlap =  rem_overlapping_regions(df_sigma, coords_sigma, sim, True)   
 
-#Removing regions overlapping with the overdense region
-df_new = rem_overlapping_regions(df_nonoverlap, df_hdel, sim, False)
+####Removing regions overlapping with the overdense region, now reduntant due to alrady calculating####
+#df_new = rem_overlapping_regions(df_nonoverlap, df_hdel, sim, False)
+
+#Getting the required new regions
+df_old = pd.read_table('GEAGLE_regions.txt', delim_whitespace=True)
+df_new = rem_overlapping_regions(df_nonoverlap, df_old, sim, False)
 print ("Required overdensity regime {} sigma +/- 1e-4: ".format(req))
 print (df_new.head())
 
