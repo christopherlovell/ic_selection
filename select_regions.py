@@ -16,13 +16,13 @@ req = float(sys.argv[1])   #receiving the required sigma region at runtime
 
 sim = simulation()
 sim.show()
-"""
+
 dat = np.load('conv_output.npz')
 dat = dat['delta']
 
 delta_log = np.log(dat)
 mu, sig = norm.fit(delta_log.flatten())
-"""
+
 import pickle as pcl
 pcl.dump(norm,open('log_delta_fit.p','wb'))
 
