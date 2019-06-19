@@ -16,13 +16,13 @@ req = float(sys.argv[1])   #receiving the required sigma region at runtime
 
 sim = simulation()
 sim.show()
-
-data = np.load('conv_output.npz')
+"""
+dat = np.load('conv_output.npz')
 dat = dat['delta']
 
 delta_log = np.log(dat)
 mu, sig = norm.fit(delta_log.flatten())
-
+"""
 import pickle as pcl
 pcl.dump(norm,open('log_delta_fit.p','wb'))
 
@@ -57,25 +57,34 @@ def rem_overlapping_regions(df, coords, sim, same):
         
     
     """
+    
     tmp = df
+    arr = np.ones(len(tmp))*np.nan
     
     if same:
         print ("Computing across same coordinates")
         dist = cdist(coords,coords,'euclidean')
+        for i in range(len(dist)):
+        
+            ok = np.where(dist[i] < 2*sim.r)[0]
+            ok = ok[ok > i]
+            if np.sum(ok) > 0.:
+                arr[ok] = ok
+    
     else:
+        print ("Computing across coordinates from dataframes")
         sel_coords = np.zeros((len(tmp), 3))
         comp_coords = np.zeros((len(coords), 3))
         sel_coords[:,0], sel_coords[:,1], sel_coords[:,2] = tmp['x'], tmp['y'], tmp['z']
         comp_coords[:,0], comp_coords[:,1], comp_coords[:,2] = coords['x'], coords['y'], coords['z']
         dist = cdist(comp_coords,sel_coords,'euclidean')
-    
-    arr = np.ones(len(tmp))*np.nan
-    for i in range(len(dist)):
+        for i in range(len(dist)):
         
-        ok = np.where(dist[i] < sim.r)[0]
-        ok = ok[ok > i]
-        if np.sum(ok) > 0.:
-            arr[ok] = ok
+            ok = np.where(dist[i] < 2*sim.r)[0]
+            if np.sum(ok) > 0.:
+                arr[ok] = ok
+    
+    
     arr = arr[~np.isnan(arr)]
     tmp = tmp.drop(arr).reset_index(drop=True)    
 
@@ -102,10 +111,10 @@ print (df_hdel.head())
 
 
 #select required-sigma regions -> req*sigma +/- tol:
-sel_sigma = selection(delta_log, centre=mu, sig=sig, dx=req, tol=5e-3).T
+sel_sigma = selection(delta_log, centre=mu, sig=sig, dx=req, tol=1e-4).T
 
 #Randomly select 100 such regions from here. This selection would remain 
-#the same as long as the set 'tol' remains the unchanged with seed '680010'.  
+#the same as long as the set 'tol' remains the unchanged with same seed '680010'.  
 rand = np.random.RandomState(seed=680010).permutation(len(sel_sigma)-1)[:100]
 sel_sigma = sel_sigma[rand]
 coords_sigma = sel_sigma * sim.conv
@@ -122,6 +131,6 @@ df_nonoverlap =  rem_overlapping_regions(df_sigma, coords_sigma, sim, True)
 
 #Removing regions overlapping with the overdense region
 df_new = rem_overlapping_regions(df_nonoverlap, df_hdel, sim, False)
-print ("Required overdensity regime {} sigma +/- 5e-3: ".format(req))
+print ("Required overdensity regime {} sigma +/- 1e-4: ".format(req))
 print (df_new.head())
 
