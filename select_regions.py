@@ -1,3 +1,9 @@
+"""
+
+    Script to load the delta values created using the chosen gridsize and selects
+    regions for resimulation
+
+"""
 
 import numpy as np
 import pandas as pd
@@ -17,8 +23,7 @@ req = float(sys.argv[1])   #receiving the required sigma region at runtime
 sim = simulation()
 sim.show()
 
-dat = np.load('conv_output.npz')
-dat = dat['delta']
+dat = np.load('conv_output.npz')['delta']
 
 delta_log = np.log(dat)
 mu, sig = norm.fit(delta_log.flatten())
