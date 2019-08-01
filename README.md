@@ -8,7 +8,7 @@ Select regions for zoom-ICs. Requires a density grid generated with [DensityGrid
 
 - `fit.py` fits the overdensity distribution (and plots it)
 
-- `select_regions.py` provides methods for selecting based on overdensity and distance from the mean. Accepts the required sigma of the region as an argument and displays a subset of the selected coordinates.
+- `select_regions.py` provides methods for selecting based on overdensity and distance from the mean. It first selects the 15 highest overdensities, so that the subsequent ones don’t overlap with it. Accepts the required sigma of the region as an argument and displays a subset of the selected coordinates.
 
 - `methods.py` contains methods for exporting files, as well as the `simulation` class containing information on the source simulation boxsize, the grid size, and the smoothing window. All changes to these parameters should be made here to ensure consistency across scripts.
 
