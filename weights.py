@@ -2,14 +2,11 @@ import numpy as np
 import pandas as pd
 
 from scipy.stats import norm
-from scipy.spatial.distance import cdist
-from methods import simulation, grid_coordinates
+from methods import simulation
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
-import pickle as pcl
 
 sim = simulation()
 sim.show()
@@ -24,27 +21,35 @@ sim.show()
 # dat = dat.reshape((sim.grid,sim.grid,sim.grid))
 dat = np.load('conv_output.npz')['delta']
 
-delta_log = np.log(dat)
+#delta_log = np.log(dat)
 mu, sig = norm.fit(delta_log.flatten())
 norm = norm(loc=mu,scale=sig)
 
 
 ## example for previous selection
-regions = pd.read_csv('GEAGLE_regions.txt',delim_whitespace=True)
+print_df = pd.read_csv('GEAGLE_regions.txt',delim_whitespace=True)
 # regions[['x','y','z']] /= sim.h
-gcood = grid_coordinates(regions[['x','y','z']], sim)
-
-print_df = pd.DataFrame({'x':regions['x'],'y':regions['y'],'z':regions['z']})
-print_df['log(1+delta)'] = delta_log[gcood['x'],gcood['y'],gcood['z']] #[delta_log[tuple(gc)] for gc in gcood]
-print_df['delta'] = np.exp(print_df['log(1+delta)']) - 1
-print_df['sigma'] = (delta_log[gcood['x'],gcood['y'],gcood['z']] - mu) / sig # [(delta_log[tuple(gc)] - mu) / sig for gc in gcood]
 
 print("Already selected regions:")
 print(print_df)
-print_df.to_csv('GEAGLE_regions_sigma.txt')
+
+#  ## example for previous selection
+#  regions = pd.read_csv('GEAGLE_regions.txt',delim_whitespace=True)
+#  # regions[['x','y','z']] /= sim.h
+#  gcood = grid_coordinates(regions[['x','y','z']], sim)
+#
+#  print_df = pd.DataFrame({'x':regions['x'],'y':regions['y'],'z':regions['z']})
+#  print_df['log(1+delta)'] = delta_log[gcood['x'],gcood['y'],gcood['z']] #[delta_log[tuple(gc)] for gc in gcood]
+#  print_df['delta'] = np.exp(print_df['log(1+delta)']) - 1
+#  print_df['sigma'] = (delta_log[gcood['x'],gcood['y'],gcood['z']] - mu) / sig # [(delta_log[tuple(gc)] - mu) / sig for gc in gcood]
+#
+#  print("Already selected regions:")
+#  print(print_df)
+#  print_df.to_csv('GEAGLE_regions_sigma.txt')
+
 
 ## Drop some regions to ensure correct weights
-print_df = print_df.drop([6,8,9,10,11,13,15,31])
+print_df = print_df.drop([15,31,33,35,37])
 
 
 # sort by log(delta+1)
@@ -52,22 +57,25 @@ print_df = print_df.drop([6,8,9,10,11,13,15,31])
 # print_df = print_df.reset_index()
 
 # bin by log(1+delta) (choose some arbitrary binning)
-bins = [-0.4,-0.3,-0.2,-0.1,0.,0.2,0.3,0.4,0.5,0.65,0.7]
+bins = np.arange(-0.4, 0.75, 0.05)
 binning = pd.cut(print_df['log(1+delta)'],bins)
 gb = print_df.groupby(binning)
 
 # find mean overdensity
 mean_od = gb.mean()['log(1+delta)'].dropna()
-lo_lim = np.hstack([-1.,(mean_od.values[1:] + mean_od.values[:-1]) / 2])
-hi_lim = np.hstack([(mean_od.values[1:] + mean_od.values[:-1]) / 2, 1.])
+lo_lim = np.hstack([np.min(delta_log)-0.01,(mean_od.values[1:] + mean_od.values[:-1]) / 2])
+hi_lim = np.hstack([(mean_od.values[1:] + mean_od.values[:-1]) / 2, np.max(delta_log)+0.01])
 
 weights = norm.cdf(hi_lim) - norm.cdf(lo_lim)
 
 # assign weights to dataframe
 # divide by number of regions
+jj = 0
 for i,(key,item) in enumerate(gb):
-    print_df.loc[item.index,'weights'] = weights[i] / len(item) 
-
+    if (item.empty == False):
+        print_df.loc[item.index,'weights'] = weights[jj] / len(item) 
+        jj+=1
+    
 
 print(sum(print_df['weights']))
 
@@ -112,7 +120,6 @@ print(sum(print_df['weights']))
 # print(sum(print_df['weights']))
 
 print_df.to_csv('weights.txt')
-
 
 ## Plot CDF with regions marked ##
 # gb = print_df.groupby('log(1+delta)')
@@ -161,3 +168,4 @@ x = np.linspace(-.8,1)
 ax2.plot(x,np.log10(1 - norm.cdf(x)), color='black', linestyle='dashed')
 
 fig.savefig('CDF.png')
+
