@@ -21,7 +21,7 @@ sim.show()
 # dat = dat.reshape((sim.grid,sim.grid,sim.grid))
 dat = np.load('conv_output.npz')['delta']
 
-# delta_log = np.log(dat)
+delta_log = np.log(dat)
 mu, sig = norm.fit(delta_log.flatten())
 norm = norm(loc=mu,scale=sig)
 
