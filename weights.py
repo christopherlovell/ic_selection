@@ -21,7 +21,7 @@ sim.show()
 # dat = dat.reshape((sim.grid,sim.grid,sim.grid))
 dat = np.load('conv_output.npz')['delta']
 
-#delta_log = np.log(dat)
+delta_log = np.log(dat)
 mu, sig = norm.fit(delta_log.flatten())
 norm = norm(loc=mu,scale=sig)
 
@@ -49,7 +49,10 @@ print(print_df)
 
 
 ## Drop some regions to ensure correct weights
-print_df = print_df.drop([15,31,33,35,37])
+al = [15,31,33] 
+lo1 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,31,33,35,37]
+lo = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37]
+print_df = print_df.drop(al)
 
 
 # sort by log(delta+1)
@@ -119,7 +122,7 @@ print(sum(print_df['weights']))
 # 
 # print(sum(print_df['weights']))
 
-print_df.to_csv('weights.txt')
+print_df.to_csv('weights_cdf.txt')
 
 ## Plot CDF with regions marked ##
 # gb = print_df.groupby('log(1+delta)')
