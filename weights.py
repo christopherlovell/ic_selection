@@ -28,7 +28,6 @@ norm = norm(loc=mu,scale=sig)
 
 ## example for previous selection
 print_df = pd.read_csv('GEAGLE_regions.txt',delim_whitespace=True)
-# regions[['x','y','z']] /= sim.h
 
 print("Already selected regions:")
 print(print_df)
@@ -43,8 +42,6 @@ print(print_df)
 #  print_df['delta'] = np.exp(print_df['log(1+delta)']) - 1
 #  print_df['sigma'] = (delta_log[gcood['x'],gcood['y'],gcood['z']] - mu) / sig # [(delta_log[tuple(gc)] - mu) / sig for gc in gcood]
 #
-#  print("Already selected regions:")
-#  print(print_df)
 #  print_df.to_csv('GEAGLE_regions_sigma.txt')
 
 
