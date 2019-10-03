@@ -90,5 +90,5 @@ for jj in range(len(pos)):
     
 weights*=(1./np.sum(weights)) 
 print_df['weights'] = weights
-print_df.to_csv('grid_weights.txt')
+print_df.to_csv('weights_grid.txt')
 print (print_df)
