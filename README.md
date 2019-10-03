@@ -12,6 +12,8 @@ Select regions for zoom-ICs. Requires a density grid generated with [DensityGrid
 
 - `methods.py` contains methods for exporting files, as well as the `simulation` class containing information on the source simulation boxsize, the grid size, and the smoothing window. All changes to these parameters should be made here to ensure consistency across scripts.
 
+- `weights_grid.py` use this for generating the weights of the resim regions 
+
 ## Instructions
 Run the following scripts in the following order:
 ```
