@@ -40,18 +40,16 @@ def get_xyz(sim):
 sim = simulation()
 sim.show()
 
-#delta = np.load('conv_output.npz')['delta']
-#delta_log = np.log(delta)
+delta = np.load('conv_output.npz')['delta']
+delta_log = np.log(delta)
 
 ## Read in the resimmed regions
 print_df = pd.read_csv('GEAGLE_regions.txt',delim_whitespace=True)
 
 ## Drop some regions to ensure correct weights
-al = [15,31,33] 
 lo1 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,31,33]
 lo = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,33]
 hi = np.arange(10,38)
-print_df = print_df.drop(al)
 
 pos = (np.array(print_df[['x','y','z']])/sim.conv).astype(int)
 weights = np.zeros(len(pos))
