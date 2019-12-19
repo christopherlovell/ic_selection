@@ -40,15 +40,15 @@ sim = simulation()
 sim.show()
 
 delta = np.load('conv_output.npz')['delta']
-delta_log = np.log(delta)
+delta_log = np.log10(delta)
 
 ## Read in the resimmed regions
-print_df = pd.read_csv('GEAGLE_regions.txt',delim_whitespace=True)
+print_df = pd.read_csv('GEAGLE_regions.txt')
 
 pos = (np.array(print_df[['x','y','z']])/sim.conv).astype(int)
 weights = np.zeros(len(pos))
 
-bins = np.linspace(np.min(delta_log)-0.01, np.max(delta_log)+0.01, 51, endpoint = True)
+bins = np.linspace(np.min(delta_log)-0.01, np.max(delta_log)+0.01, 26, endpoint = True)
 
 hist, edges = np.histogram(delta_log, bins = bins)
 ntot = np.sum(hist)

@@ -5,7 +5,7 @@ from scipy.stats import norm
 from methods import simulation
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 sim = simulation()
@@ -21,13 +21,13 @@ sim.show()
 # dat = dat.reshape((sim.grid,sim.grid,sim.grid))
 dat = np.load('conv_output.npz')['delta']
 
-delta_log = np.log(dat)
+delta_log = np.log10(dat)
 mu, sig = norm.fit(delta_log.flatten())
 norm = norm(loc=mu,scale=sig)
 
 
 ## example for previous selection
-print_df = pd.read_csv('GEAGLE_regions.txt',delim_whitespace=True)
+print_df = pd.read_csv('GEAGLE_regions.txt')
 
 print("Already selected regions:")
 print(print_df)
@@ -49,7 +49,7 @@ print(print_df)
 # print_df = print_df.reset_index()
 
 # bin by log(1+delta) (choose some arbitrary binning)
-bins = np.arange(-0.4, 0.75, 0.05)
+bins = np.linspace(np.min(delta_log)-0.01, np.max(delta_log)+0.01, 26, endpoint = True)
 binning = pd.cut(print_df['log(1+delta)'],bins)
 gb = print_df.groupby(binning)
 

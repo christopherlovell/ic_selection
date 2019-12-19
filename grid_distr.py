@@ -43,12 +43,12 @@ sim = simulation()
 sim.show()
 
 delta = np.load('conv_output.npz')['delta']
-delta_log = np.log(delta)
+delta_log = np.log10(delta)
 delta_sorted = np.sort(delta_log.flatten())
-bins = np.linspace(np.min(delta_log)-0.01, np.max(delta_log)+0.01, 51, endpoint = True)
+bins = np.linspace(np.min(delta_log)-0.01, np.max(delta_log)+0.01, 26, endpoint = True)
 
 ## Read in the resimmed regions
-print_df = pd.read_csv('GEAGLE_regions.txt',delim_whitespace=True)
+print_df = pd.read_csv('GEAGLE_regions.txt')
 print_df = (print_df.sort_values(by=['delta'], ascending=True)).reset_index(drop=True)
 pos = (np.array(print_df[['x','y','z']])/sim.conv).astype(int)
 nsims = len(pos)
@@ -69,17 +69,15 @@ for jj in range(len(pos)):
     del_grids[jj] = delta_log[(xx,yy,zz)]
 
 fig, ax = plt.subplots(1,1)
-ax.hist(delta_sorted, density='True', bins=500, label = 'All grids', color = 'red', ls = 'dashed', histtype = 'step', lw = 2, stacked = True)
+ax.hist(delta_sorted, density='True', bins=500, label = 'All grids', color = 'black', ls = 'dashed', histtype = 'step', lw = 2, stacked = True)
 ax.hist(del_grids.flatten(), density='True', bins=bins, label = 'Resim grids', color = 'black', histtype = 'step', lw = 2, stacked = True)
-# for ii, jj in enumerate(bins):
-#     ax.axvline(x = bins[ii], ymin = 0, ymax = 0.3, color = 'blue')
+
 ax.set_xlim(np.min(delta_log)-0.1,np.max(delta_log)+0.1)
 ax.grid(True)
-ax.set_xlabel(r'ln(1+$\delta$)', fontsize = 15)
+ax.set_xlabel(r'log$_{10}$(1+$\delta$)', fontsize = 15)
 ax.set_ylabel(r'PDF', fontsize = 15)
-#ax.legend(frameon=False, numpoints=1)
-ax.text(0.27, 3.1, '- - All grids', color = 'red', fontsize = 14)
-ax.text(0.27, 2.8, '__ ', color = 'black', fontsize = 14)
-ax.text(0.35, 2.7, 'Resim grids', color = 'black', fontsize = 14)
+ax.text(0.14, 7.1, '- - All grids', color = 'black', fontsize = 14)
+ax.text(0.14, 6.8, '__ ', color = 'black', fontsize = 14)
+ax.text(0.18, 6.6, 'Resim grids', color = 'black', fontsize = 14)
 fig.savefig('sampling_bins.pdf')
 plt.show()

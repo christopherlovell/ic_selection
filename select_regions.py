@@ -25,11 +25,11 @@ sim.show()
 
 dat = np.load('conv_output.npz')['delta']
 
-delta_log = np.log(dat)
+delta_log = np.log10(dat)
 mu, sig = norm.fit(delta_log.flatten())
 
-import pickle as pcl
-pcl.dump(norm,open('log_delta_fit.p','wb'))
+#import pickle as pcl
+#pcl.dump(norm,open('log_delta_fit.p','wb'))
 
 def selection(x,centre,sig,dx,tol=5e-3):
 
@@ -111,7 +111,7 @@ def get_highest_overdensity(delta_log, sim, mu, sig, num = 1000, prime = True):
     ## Dataframe contents of the highest overdensity regions:
     df_hdel = pd.DataFrame({'x': coords_hdel[:,0], 'y': coords_hdel[:,1], 'z': coords_hdel[:,2]})
     df_hdel['log(1+delta)'] = delta_log[sel]
-    df_hdel['delta'] = np.exp(df_hdel['log(1+delta)']) - 1
+    df_hdel['delta'] = 10**(df_hdel['log(1+delta)']) - 1
     df_hdel['sigma'] = (delta_log[sel] - mu)/sig
     df_hdel = (df_hdel.sort_values(by=['sigma'], ascending=False)).reset_index(drop=True)
     coords_hdel[:,0], coords_hdel[:,1], coords_hdel[:,2] = df_hdel['x'], df_hdel['y'], df_hdel['z']
@@ -143,7 +143,7 @@ def get_lowest_overdensity(delta_log, sim, mu, sig, num = 1000, prime = True):
     ## Dataframe contents of the highest overdensity regions:
     df_ldel = pd.DataFrame({'x': coords_ldel[:,0], 'y': coords_ldel[:,1], 'z': coords_ldel[:,2]})
     df_ldel['log(1+delta)'] = delta_log[sel]
-    df_ldel['delta'] = np.exp(df_ldel['log(1+delta)']) - 1
+    df_ldel['delta'] = 10**(df_ldel['log(1+delta)']) - 1
     df_ldel['sigma'] = (delta_log[sel] - mu)/sig
     df_ldel = (df_ldel.sort_values(by=['sigma'], ascending=True)).reset_index(drop=True)
     coords_ldel[:,0], coords_ldel[:,1], coords_ldel[:,2] = df_ldel['x'], df_ldel['y'], df_ldel['z']
@@ -174,7 +174,7 @@ sel = [(sel_sigma[:,0]), (sel_sigma[:,1]), (sel_sigma[:,2])]
 ## Dataframe contents of the required region:
 df_sigma = pd.DataFrame({'x': coords_sigma[:,0], 'y': coords_sigma[:,1], 'z': coords_sigma[:,2]})
 df_sigma['log(1+delta)'] = delta_log[sel]
-df_sigma['delta'] = np.exp(df_sigma['log(1+delta)']) - 1
+df_sigma['delta'] = 10**(df_sigma['log(1+delta)']) - 1
 df_sigma['sigma'] = (delta_log[sel] - mu)/sig
 
 #Removing overlapping regions within this overdensity range
