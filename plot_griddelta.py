@@ -73,7 +73,7 @@ for jj in range(len(pos)):
 
     del_grids[jj] = delta_log[(xx,yy,zz)]
 
-sims = np.linspace(0, 1, nsims)
+sims = np.linspace(0.15, 7.55, nsims)
 
 fig, axs = plt.subplots(nrows = 1, ncols = 1, figsize=(8, 8), sharex=True, sharey=True,
                             facecolor='w', edgecolor='k')
@@ -85,12 +85,18 @@ for jj in range(nsims):
     axs.scatter(del_centre[jj], sims[jj], s = 25, color='black', marker='x')
 
 #axs.axhline(y = 0, lw = 1)
-
+axs.set_xlim(np.min(delta_log)-0.02,np.max(delta_log)+0.02)
+axs.set_ylim(0, 7.7)
 cbaxes = fig.add_axes([0.2, 0.5, 0.03, 0.35])
 fig.colorbar(s_m, cax=cbaxes)
 cbaxes.set_ylabel(r'log$_{10}$(1+$\delta_{\mathrm{centre}}$)', fontsize = 18)
 axs.set_xlabel(r'log$_{10}$(1+$\delta$)', fontsize = 18)
-axs.set_yticks([], [])
+axs.set_ylabel(r'PDF', fontsize = 18)
+axs.yaxis.label.set_color('white')
+axs.tick_params(axis='y', colors='white')
+for label in (axs.get_xticklabels() + cbaxes.get_yticklabels()):
+    label.set_fontsize(15)
+fig.tight_layout()
 #axs.set_ylabel(r'CDF', fontsize = 18)
-plt.savefig('cum_delta.png')
+plt.savefig('cum_delta.pdf')
 plt.close()

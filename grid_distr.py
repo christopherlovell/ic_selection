@@ -42,9 +42,9 @@ def get_xyz(sim):
 sim = simulation()
 sim.show()
 
-delta = np.load('conv_output.npz')['delta']
-delta_log = np.log10(delta)
-delta_sorted = np.sort(delta_log.flatten())
+# delta = np.load('conv_output.npz')['delta']
+# delta_log = np.log10(delta)
+# delta_sorted = np.sort(delta_log.flatten())
 bins = np.linspace(np.min(delta_log)-0.01, np.max(delta_log)+0.01, 26, endpoint = True)
 
 ## Read in the resimmed regions
@@ -68,16 +68,20 @@ for jj in range(len(pos)):
 
     del_grids[jj] = delta_log[(xx,yy,zz)]
 
-fig, ax = plt.subplots(1,1)
-ax.hist(delta_sorted, density='True', bins=500, label = 'All grids', color = 'black', ls = 'dashed', histtype = 'step', lw = 2, stacked = True)
+fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize=(6, 6), sharex=True, sharey=True,
+                            facecolor='w', edgecolor='k')
+ax.hist(delta_sorted, density='True', bins=500, label = 'All grids', color = 'black', ls = 'dashed', histtype = 'step', lw = 1.5, stacked = True)
 ax.hist(del_grids.flatten(), density='True', bins=bins, label = 'Resim grids', color = 'black', histtype = 'step', lw = 2, stacked = True)
 
-ax.set_xlim(np.min(delta_log)-0.1,np.max(delta_log)+0.1)
+ax.set_xlim(np.min(delta_log)-0.02,np.max(delta_log)+0.02)
 ax.grid(True)
-ax.set_xlabel(r'log$_{10}$(1+$\delta$)', fontsize = 15)
-ax.set_ylabel(r'PDF', fontsize = 15)
-ax.text(0.14, 7.1, '- - All grids', color = 'black', fontsize = 14)
-ax.text(0.14, 6.8, '__ ', color = 'black', fontsize = 14)
-ax.text(0.18, 6.6, 'Resim grids', color = 'black', fontsize = 14)
+ax.set_xlabel(r'log$_{10}$(1+$\delta$)', fontsize = 18)
+ax.set_ylabel(r'PDF', fontsize = 18)
+for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+    label.set_fontsize(15)
+ax.text(0.1, 7.1, '- - All grids', color = 'black', fontsize = 15)
+ax.text(0.1, 6.8, '__ ', color = 'black', fontsize = 15)
+ax.text(0.14, 6.6, 'Resim grids', color = 'black', fontsize = 15)
+fig.tight_layout()
 fig.savefig('sampling_bins.pdf')
 plt.show()
