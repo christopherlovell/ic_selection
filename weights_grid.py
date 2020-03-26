@@ -38,9 +38,11 @@ def get_xyz(sim):
 
 sim = simulation()
 sim.show()
+nbins = 25 #Number of bins used for sampling the log overdensity
 
-delta = np.load('conv_output.npz')['delta']
-delta_log = np.log10(delta)
+
+# delta = np.load('conv_output.npz')['delta']
+# delta_log = np.log10(delta)
 
 ## Read in the resimmed regions
 print_df = pd.read_csv('GEAGLE_regions.txt')
@@ -48,7 +50,7 @@ print_df = pd.read_csv('GEAGLE_regions.txt')
 pos = (np.array(print_df[['x','y','z']])/sim.conv).astype(int)
 weights = np.zeros(len(pos))
 
-bins = np.linspace(np.min(delta_log)-0.01, np.max(delta_log)+0.01, 26, endpoint = True)
+bins = np.linspace(np.min(delta_log)-0.01, np.max(delta_log)+0.01, nbins + 1, endpoint = True)
 
 hist, edges = np.histogram(delta_log, bins = bins)
 ntot = np.sum(hist)
@@ -84,3 +86,8 @@ weights*=(1./np.sum(weights))
 print_df['weights'] = weights
 print_df.to_csv('weights_grid.txt')
 print (print_df)
+
+# ## Making latex table of weights
+#
+# df = df[['id', 'x', 'y', 'z', 'delta', 'sigma', 'weights']]
+# with open('weights_table.tex','w') as tf: tf.write(df.to_latex(index=False))
