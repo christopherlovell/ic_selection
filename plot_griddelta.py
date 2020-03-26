@@ -4,7 +4,10 @@ import pandas as pd
 import gc
 from methods import simulation
 import matplotlib
+matplotlib.rcParams['text.usetex'] = True
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_context("paper")
 
 def get_xyz(sim):
 
@@ -94,9 +97,9 @@ axs.set_xlabel(r'log$_{10}$(1+$\delta$)', fontsize = 18)
 axs.set_ylabel(r'PDF', fontsize = 18)
 axs.yaxis.label.set_color('white')
 axs.tick_params(axis='y', colors='white')
+axs.xaxis.grid(True, alpha=0.4)
 for label in (axs.get_xticklabels() + cbaxes.get_yticklabels()):
     label.set_fontsize(15)
-fig.tight_layout()
-#axs.set_ylabel(r'CDF', fontsize = 18)
+
 plt.savefig('cum_delta.pdf')
 plt.close()
