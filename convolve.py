@@ -1,14 +1,20 @@
-import os
+import os, sys
+import importlib
 import numpy as np
 from scipy import ndimage
 
-from methods import write_multidimensional_array, simulation
+from methods import write_multidimensional_array
 
-sim = simulation()
+simname = sys.argv[1]
+fname = sys.argv[2]
+outname = sys.argv[3]
+
+sim = importlib.import_module(simname)
+sim = sim.simulation()
 sim.show()
-snap = '002'
 
-dat = np.fromfile('./grid_weights/out_1200.bin',sep='\n')
+#dat = np.fromfile('./grid_weights/out_1200.bin',sep='\n')
+dat = np.fromfile(fname,sep='\n')
 dat = np.reshape(dat, (sim.grid,sim.grid,sim.grid), 'F')
 
 
@@ -49,4 +55,7 @@ mean_density = np.mean(conv_grid)
 delta = conv_grid/mean_density # delta + 1
 
 #write_multidimensional_array(delta, 'conv_out.txt')
-np.savez_compressed('conv_output', delta = delta)
+# np.savez_compressed('conv_output', delta = delta)
+np.savez_compressed(outname, delta = delta)
+
+

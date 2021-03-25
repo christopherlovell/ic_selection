@@ -4,6 +4,7 @@
     regions for resimulation. The coordinate positions are in cMpc/h.
 
 """
+import sys
 
 import numpy as np
 import pandas as pd
@@ -16,12 +17,13 @@ import matplotlib
 #matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-import sys
+simname = sys.argv[1]
+req = float(sys.argv[2])   #receiving the required sigma region at runtime
 
-req = float(sys.argv[1])   #receiving the required sigma region at runtime
-
-sim = simulation()
+sim = importlib.import_module(simname)
+sim = sim.simulation()
 sim.show()
+
 
 dat = np.load('conv_output.npz')['delta']
 

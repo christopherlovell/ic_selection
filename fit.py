@@ -5,21 +5,26 @@
 
 """
 
+import sys
 
 import numpy as np
 import pandas as pd
 
 from scipy.stats import norm
 from scipy.spatial.distance import cdist
-from methods import simulation, grid_coordinates
+from methods import grid_coordinates
 
 import matplotlib
 #matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
-sim = simulation()
+simname = sys.argv[1]
+
+sim = importlib.import_module(simname)
+sim = sim.simulation()
 sim.show()
+
 
 dat = np.load('conv_output.npz')['delta']
 
